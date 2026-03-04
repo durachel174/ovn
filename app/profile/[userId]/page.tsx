@@ -13,12 +13,21 @@ type Profile = {
   avatar_url: string | null
 }
 
+type Rating = {
+  id: string
+  stars: number
+  review: string | null
+  created_at: string
+  reviewer_id: string
+}
+
 type Listing = {
   id: string
   title: string
   description: string
   price: number | null
   is_free: boolean
+  is_sold: boolean
   category: string
   image_url: string | null
 }
@@ -45,6 +54,7 @@ export default function ProfilePage() {
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [isOwner, setIsOwner] = useState(false)
+  const [ratings, setRatings] = useState<Rating[]>([])
   const params = useParams()
   const router = useRouter()
   const supabase = createClient()
@@ -65,6 +75,14 @@ export default function ProfilePage() {
         .select('*')
         .eq('seller_id', params.userId)
         .order('created_at', { ascending: false })
+
+        const { data: ratingsData } = await supabase
+        .from('ratings')
+        .select('*')
+        .eq('reviewee_id', params.userId)
+        .order('created_at', { ascending: false })
+
+        setRatings(ratingsData ?? [])
 
       setProfile(profileData)
       setListings(listingsData ?? [])
@@ -126,6 +144,36 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Ratings */}
+        {ratings.length > 0 && (
+        <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 mb-6">
+            <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-lg font-bold font-serif text-stone-800">Reviews</h2>
+            <div className="flex items-center gap-1">
+                <span className="text-mauve-400 text-sm">★</span>
+                <span className="text-stone-700 text-sm font-semibold">
+                {(ratings.reduce((sum, r) => sum + r.stars, 0) / ratings.length).toFixed(1)}
+                </span>
+                <span className="text-stone-400 text-xs">({ratings.length})</span>
+            </div>
+            </div>
+            <div className="flex flex-col gap-4">
+            {ratings.map(rating => (
+                <div key={rating.id} className="border-t border-stone-100 pt-4 first:border-0 first:pt-0">
+                <div className="flex items-center gap-1 mb-1">
+                    {[1,2,3,4,5].map(star => (
+                    <span key={star} className={`text-sm ${star <= rating.stars ? 'text-mauve-400' : 'text-stone-200'}`}>★</span>
+                    ))}
+                </div>
+                {rating.review && (
+                    <p className="text-stone-500 text-sm leading-relaxed">{rating.review}</p>
+                )}
+                </div>
+            ))}
+            </div>
+        </div>
+        )}
+
         {/* Listings */}
         <div className="mb-4">
           <h2 className="text-lg font-bold font-serif text-stone-800">
@@ -154,10 +202,15 @@ export default function ProfilePage() {
                 {listing.image_url ? (
                   <div className="w-full aspect-square overflow-hidden relative">
                     <img
-                      src={listing.image_url}
-                      alt={listing.title}
-                      className="w-full h-full object-cover"
+                        src={listing.image_url}
+                        alt={listing.title}
+                        className={`w-full h-full object-cover ${listing.is_sold ? 'opacity-50' : ''}`}
                     />
+                    {listing.is_sold && (
+                        <div className="absolute top-2 left-2 bg-stone-800 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                        Sold
+                        </div>
+                    )}
                     <div className="absolute bottom-3 left-3 right-3">
                       <div className="bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2">
                         <p className="text-stone-800 font-semibold text-sm leading-snug line-clamp-1">
@@ -170,7 +223,12 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 ) : (
-                  <div className={`w-full aspect-square flex flex-col items-center justify-center p-4 text-center ${PASTEL_COLORS[listing.id.charCodeAt(0) % PASTEL_COLORS.length]}`}>
+                  <div className={`w-full aspect-square flex flex-col items-center justify-center p-4 text-center relative ${PASTEL_COLORS[listing.id.charCodeAt(0) % PASTEL_COLORS.length]} ${listing.is_sold ? 'opacity-50' : ''}`}>
+                    {listing.is_sold && (
+                        <div className="absolute top-2 left-2 bg-stone-800 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                        Sold
+                        </div>
+                    )}
                     <p className="text-stone-800 font-bold text-lg font-serif leading-snug line-clamp-3">
                       {listing.title}
                     </p>
