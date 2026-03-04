@@ -10,6 +10,7 @@ type Listing = {
   description: string
   price: number | null
   is_free: boolean
+  is_sold: boolean
   category: string
   image_url: string | null
   seller_id: string
@@ -35,6 +36,7 @@ export default function ListingPage() {
   const router = useRouter()
   const params = useParams()
   const supabase = createClient()
+  const [marking, setMarking] = useState(false)
 
   useEffect(() => {
     async function fetch() {
@@ -58,6 +60,16 @@ export default function ListingPage() {
     await supabase.from('listings').delete().eq('id', listing!.id)
     router.push('/listings')
   }
+
+  async function handleMarkSold() {
+    setMarking(true)
+    await supabase
+        .from('listings')
+        .update({ is_sold: true })
+        .eq('id', listing!.id)
+    setListing(prev => prev ? { ...prev, is_sold: true } : prev)
+    setMarking(false)
+    }
 
   async function handleSendMessage() {
     setError('')
@@ -163,20 +175,35 @@ export default function ListingPage() {
 
             <div className="mt-6">
               {isSeller ? (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => router.push(`/listings/${listing.id}/edit`)}
-                    className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium rounded-xl text-sm transition-colors"
-                  >
-                    Edit listing
-                  </button>
-                  <button
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 font-medium rounded-xl text-sm transition-colors disabled:opacity-50"
-                  >
-                    {deleting ? 'Deleting...' : 'Delete listing'}
-                  </button>
+                <div className="flex flex-col gap-2">
+                    {listing.is_sold ? (
+                    <div className="w-full py-2.5 bg-stone-100 text-stone-400 font-medium rounded-xl text-sm text-center">
+                        Marked as sold
+                    </div>
+                    ) : (
+                    <button
+                        onClick={handleMarkSold}
+                        disabled={marking}
+                        className="w-full py-2.5 bg-stone-800 hover:bg-stone-900 text-white font-medium rounded-xl text-sm transition-colors disabled:opacity-50"
+                    >
+                        {marking ? 'Updating...' : 'Mark as sold'}
+                    </button>
+                    )}
+                    <div className="flex gap-2">
+                    <button
+                        onClick={() => router.push(`/listings/${listing.id}/edit`)}
+                        className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium rounded-xl text-sm transition-colors"
+                    >
+                        Edit listing
+                    </button>
+                    <button
+                        onClick={handleDelete}
+                        disabled={deleting}
+                        className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 font-medium rounded-xl text-sm transition-colors disabled:opacity-50"
+                    >
+                        {deleting ? 'Deleting...' : 'Delete listing'}
+                    </button>
+                    </div>
                 </div>
               ) : sent ? (
                 <div className="bg-mauve-50 border border-mauve-200 rounded-2xl p-4">

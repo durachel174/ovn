@@ -13,6 +13,7 @@ type Listing = {
   description: string
   price: number | null
   is_free: boolean
+  is_sold: boolean
   category: string
   image_url: string | null
   created_at: string
@@ -148,10 +149,15 @@ const PASTEL_COLORS = [
                   {listing.image_url ? (
                     <div className="w-full aspect-square overflow-hidden relative">
                         <img
-                        src={listing.image_url}
-                        alt={listing.title}
-                        className="w-full h-full object-cover"
+                            src={listing.image_url}
+                            alt={listing.title}
+                            className={`w-full h-full object-cover ${listing.is_sold ? 'opacity-50' : ''}`}
                         />
+                        {listing.is_sold && (
+                            <div className="absolute top-2 left-2 bg-stone-800 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                            Sold
+                            </div>
+                        )}
                         <div className="absolute bottom-3 left-3 right-3">
                             <div className="bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2">
                                 <p className="text-stone-800 font-semibold text-sm leading-snug line-clamp-1">
@@ -169,7 +175,12 @@ const PASTEL_COLORS = [
                         </div>
                     </div>
                   ) : (
-                    <div className={`w-full aspect-square flex flex-col items-center justify-center p-4 text-center ${PASTEL_COLORS[listing.id.charCodeAt(0) % PASTEL_COLORS.length]}`}>
+                    <div className={`w-full aspect-square flex flex-col items-center justify-center p-4 text-center relative ${PASTEL_COLORS[listing.id.charCodeAt(0) % PASTEL_COLORS.length]} ${listing.is_sold ? 'opacity-50' : ''}`}>
+                        {listing.is_sold && (
+                            <div className="absolute top-2 left-2 bg-stone-800 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                            Sold
+                            </div>
+                        )}
                       <p className="text-stone-800 font-bold text-lg font-serif leading-snug line-clamp-3">
                         {listing.title}
                       </p>
