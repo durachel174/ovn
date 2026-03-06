@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { BAY_AREA_ZIPS } from '@/lib/bayAreaZips'
+const PRESET_ALLERGENS = ['Gluten', 'Dairy', 'Eggs', 'Nuts', 'Peanuts', 'Soy', 'Sesame']
 
 export default function NewListingPage() {
   const [title, setTitle] = useState('')
@@ -17,6 +18,24 @@ export default function NewListingPage() {
   const [error, setError] = useState('')
   const router = useRouter()
   const supabase = createClient()
+  const [allergens, setAllergens] = useState<string[]>([])
+  const [customAllergen, setCustomAllergen] = useState('')
+
+  function toggleAllergen(allergen: string) {
+  setAllergens(prev =>
+    prev.includes(allergen)
+      ? prev.filter(a => a !== allergen)
+      : [...prev, allergen]
+  )
+}
+
+    function addCustomAllergen() {
+    const trimmed = customAllergen.trim()
+    if (trimmed && !allergens.includes(trimmed)) {
+        setAllergens(prev => [...prev, trimmed])
+    }
+    setCustomAllergen('')
+    }
 
   async function handleSubmit() {
     setLoading(true)
@@ -58,6 +77,7 @@ export default function NewListingPage() {
       image_url: imageUrl,
       lat: zipCode ? BAY_AREA_ZIPS[zipCode].lat : null,
       lng: zipCode ? BAY_AREA_ZIPS[zipCode].lng : null,
+      allergens,
     })
 
     if (insertError) {
@@ -152,6 +172,56 @@ export default function NewListingPage() {
               />
             )}
           </div>
+
+          <div>
+            <label className="text-xs font-medium text-stone-500 block mb-1.5">Allergens</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+                {PRESET_ALLERGENS.map(allergen => (
+                <button
+                    key={allergen}
+                    type="button"
+                    onClick={() => toggleAllergen(allergen)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                    allergens.includes(allergen)
+                        ? 'bg-stone-800 text-white border-stone-800'
+                        : 'bg-white text-stone-500 border-stone-200 hover:border-stone-400'
+                    }`}
+                >
+                    {allergen}
+                </button>
+                ))}
+            </div>
+            <div className="flex gap-2">
+                <input
+                type="text"
+                placeholder="Add custom allergen..."
+                value={customAllergen}
+                onChange={e => setCustomAllergen(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addCustomAllergen()}
+                className="flex-1 px-4 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-mauve-400"
+                />
+                <button
+                type="button"
+                onClick={addCustomAllergen}
+                className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-600 text-sm rounded-xl transition-colors"
+                >
+                Add
+                </button>
+            </div>
+            {allergens.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                {allergens.map(a => (
+                    <span
+                    key={a}
+                    className="flex items-center gap-1 px-2.5 py-1 bg-mauve-50 text-mauve-600 text-xs rounded-full"
+                    >
+                    {a}
+                    <button onClick={() => toggleAllergen(a)} className="hover:text-mauve-800">×</button>
+                    </span>
+                ))}
+                </div>
+            )}
+            </div>
 
           <div>
             <label className="text-xs font-medium text-stone-500 block mb-1.5">Photo</label>

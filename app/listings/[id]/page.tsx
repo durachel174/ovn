@@ -14,6 +14,7 @@ type Listing = {
   category: string
   image_url: string | null
   seller_id: string
+  allergens: string[]
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -172,6 +173,22 @@ export default function ListingPage() {
             {listing.description && (
               <p className="text-stone-500 text-sm mt-4 leading-relaxed">{listing.description}</p>
             )}
+
+            {listing.allergens && listing.allergens.length > 0 && (
+                <div className="mt-4">
+                    <p className="text-xs font-medium text-stone-500 mb-2">⚠️ Contains allergens</p>
+                    <div className="flex flex-wrap gap-1.5">
+                    {listing.allergens.map(allergen => (
+                        <span
+                        key={allergen}
+                        className="px-2.5 py-1 bg-rose-50 text-rose-500 text-xs font-medium rounded-full border border-rose-100"
+                        >
+                        {allergen}
+                        </span>
+                    ))}
+                    </div>
+                </div>
+                )}
 
             <div className="mt-6">
               {isSeller ? (
