@@ -1,18 +1,9 @@
 'use client'
 
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { useState } from 'react'
+import { useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-
-const icon = L.icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-})
 
 type Listing = {
   id: string
@@ -22,6 +13,30 @@ type Listing = {
   image_url: string | null
   lat: number | null
   lng: number | null
+}
+
+function createPriceIcon(label: string) {
+  return L.divIcon({
+    html: `
+      <div style="
+        background: #cc7d8d;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        display: inline-block;
+      ">
+        ${label}
+      </div>
+    `,
+    className: '',
+    iconSize: undefined,
+    iconAnchor: undefined,
+    popupAnchor: [0, -20],
+  })
 }
 
 export default function ListingsMap({ listings }: { listings: Listing[] }) {
@@ -35,26 +50,28 @@ export default function ListingsMap({ listings }: { listings: Listing[] }) {
         style={{ width: '100%', height: '100%' }}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap contributors'
+          url={`https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/{z}/{x}/{y}?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`}
+          attribution='&copy; <a href="https://www.mapbox.com">Mapbox</a>'
+          tileSize={512}
+          zoomOffset={-1}
         />
         {mappable.map(listing => (
           <Marker
             key={listing.id}
             position={[listing.lat!, listing.lng!]}
-            icon={icon}
+            icon={createPriceIcon(listing.is_free ? 'Free' : `$${listing.price}`)}
           >
             <Popup>
-              <div className="p-1">
+              <div style={{ minWidth: '120px' }}>
                 {listing.image_url && (
                   <img
                     src={listing.image_url}
                     alt={listing.title}
-                    className="w-full h-24 object-cover rounded-lg mb-2"
+                    style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '8px', marginBottom: '6px' }}
                   />
                 )}
-                <p className="font-semibold text-stone-800 text-sm">{listing.title}</p>
-                <p className="text-mauve-500 text-xs mt-0.5">
+                <p style={{ fontWeight: 600, fontSize: '13px', color: '#292524' }}>{listing.title}</p>
+                <p style={{ fontSize: '11px', color: '#cc7d8d', marginTop: '2px', fontStyle: listing.is_free ? 'italic' : 'normal' }}>
                   {listing.is_free ? 'Complimentary' : `$${listing.price}`}
                 </p>
               </div>
