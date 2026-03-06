@@ -2,7 +2,7 @@
 
 **A location-based peer-to-peer marketplace for home bakers in the Bay Area.**
 
-🔗 **Live:** [https://ovn-nu.vercel.app](https://ovn-nu.vercel.app)
+🔗 **Live:** [https://ovn-nu.vercel.app](https://ovn-nu.vercel.app) · **Write-up:** [Read on Medium](https://medium.com/@durachel174/i-built-a-bakery-marketplace-because-a-girl-used-hinge-to-sell-sourdough-d8c5f48f22ba)
 
 ---
 
