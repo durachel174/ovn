@@ -6,6 +6,14 @@
 
 ---
 
+## The Story
+
+It started with a TikTok video — a girl using Hinge, a dating app, to share her homemade sourdough loaves with strangers because she had nowhere else to post them. That image stuck with me. She wasn't looking for a date. She just wanted to share something she'd made with people nearby.
+
+I'm a baking enthusiast myself. I know the feeling of pulling something out of the oven and wanting the whole neighborhood to smell it. That moment when butter fills the air of your entire house — it deserves to be shared, not just posted into the void of a general marketplace or buried in a dating app DM.
+
+San Francisco and the Bay Area felt like the natural home for this. The region has one of the most vibrant food cultures in the country, with a deep tradition of artisan baking — from sourdough born in the Gold Rush to the world-class pastry shops that line its neighborhoods today. There's already a community here. Ovn just gives it a place to live.
+
 ## Overview
 
 Ovn connects home bakers with their local community through listing discovery, map-based search, and in-app messaging. It fills the gap between large commercial food platforms and informal social media exchanges — giving bakers a calm, structured space to share what they've made with people nearby.
