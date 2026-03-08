@@ -99,7 +99,7 @@ ratings
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/ovn.git
+git clone https://github.com/durachel174/ovn.git
 cd ovn
 
 # Install dependencies
